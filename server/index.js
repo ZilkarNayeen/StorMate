@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 import connectDB from "./db/connection.js";
 import categoryRoutes from "./routes/category.js";
 import authroutes from "./routes/auth.js";
+import supplierRoutes from './routes/supplier.js';
+import productRoutes from "./routes/product.js";
+import orderRoutes from "./routes/order.js";
 
 dotenv.config();
 
@@ -14,6 +17,10 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authroutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/suppliers",supplierRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);   
+
 
 const PORT = process.env.PORT || 5713;
 

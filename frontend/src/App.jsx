@@ -7,7 +7,9 @@ import Dashboard from './pages/Dashboard';
 
 import Categories from './components/Categories';
 import Root from './utils/Root';
-
+import Suppliers from './components/Suppliers';
+import Products from './components/Products';
+import Orders from './components/Orders';
 function App() {
   return (
     <Router>
@@ -25,9 +27,9 @@ function App() {
               
               <Route index element={<h1>Store Mate offers a powerful yet easy-to-use inventory management system that helps you keep full control over your stock. You can effortlessly add, edit, or delete products, organize them into categories, and track quantity changes in real-time. With features like low stock alerts, barcode scanning, and smart search filters, managing thousands of items becomes quick and stress-free. Store Mate also logs all stock activity so you can view your inventory history anytime, making your store operations more transparent and efficient.</h1>} />
               <Route path="categories" element={<Categories/>} />
-              <Route path="products" element={<h1>products</h1>} />
-              <Route path="suppliers" element={<h1>suppliers</h1>} />
-              <Route path="orders" element={<h1>orders</h1>} />
+              <Route path="products" element={<Products/>} />
+              <Route path="suppliers" element={<Suppliers/>} />
+              <Route path="orders" element={<Orders/>} />
               <Route path="users" element={<h1>users</h1>} />
             </Route>
           </Route>
