@@ -9,8 +9,8 @@ const Sidebar = () => {
    {name: "Categories", path: "/admin-dashboard/categories", icon:<FaTable />,isParent: false},
    {name: "Orders", path: "/admin-dashboard/orders", icon:<FaShoppingCart />,isParent: false},
    {name: "Supppliers", path: "/admin-dashboard/suppliers", icon:<FaTruck />,isParent: false},
-   {name: "Users", path: "/admin-dashboard/users", icon:<FaUsers />,isParent: false},
-   {name: "Profile", path: "/admin-dashboard/profile", icon:<FaCog />,isParent: false},
+   {name: "Transactions", path: "/admin-dashboard/transactions", icon:<FaUsers />,isParent: false},
+  
    {name: "Logout", path: "/admin-dashboard/logout", icon:<FaSignOutAlt />,isParent: false},
    ];
   return (

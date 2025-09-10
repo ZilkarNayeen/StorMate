@@ -1,20 +1,27 @@
-import { useEffect } from "react"; // Added useEffect
+import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Outlet, useNavigate } from "react-router";
 
 const ProtectedRoutes = ({ requireRole }) => {
-    const { user } = useAuth();
-    const navigate = useNavigate();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!user) {
-            navigate("/login");
-        } else if (requireRole && !requireRole.includes(user.role)) {
-            navigate("/unauthorized");
-        }
-    }, [user, requireRole, navigate]); // Added dependencies to the hook
+  useEffect(() => {
+    // If no user, redirect to login
+    if (!user) {
+      navigate("/login");
+    } 
+    // If user role not allowed, redirect to unauthorized
+    else if (requireRole && !requireRole.includes(user.role)) {
+      navigate("/unauthorized");
+    }
+  }, [user, requireRole, navigate]);
 
-    return user && (requireRole.includes(user.role)) ? <Outlet /> : null;
+  // Render only if user exists and role is allowed
+  if (!user) return null;
+  if (requireRole && !requireRole.includes(user.role)) return null;
+
+  return <Outlet />;
 };
 
 export default ProtectedRoutes;

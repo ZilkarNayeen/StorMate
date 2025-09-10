@@ -10,6 +10,8 @@ import Root from './utils/Root';
 import Suppliers from './components/Suppliers';
 import Products from './components/Products';
 import Orders from './components/Orders';
+import ItemTransaction from "./components/ItemTransaction";
+
 function App() {
   return (
     <Router>
@@ -30,7 +32,7 @@ function App() {
               <Route path="products" element={<Products/>} />
               <Route path="suppliers" element={<Suppliers/>} />
               <Route path="orders" element={<Orders/>} />
-              <Route path="users" element={<h1>users</h1>} />
+              <Route path="Transactions" element={<ItemTransaction/>} />
             </Route>
           </Route>
 
