@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
-import AuthProvider from './context/AuthContext';
+import {AuthProvider} from './context/AuthContext';
 import ProtectedRoutes from './utils/ProtectedRoutes';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';

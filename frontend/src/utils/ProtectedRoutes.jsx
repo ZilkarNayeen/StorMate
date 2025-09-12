@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext.jsx"; // include .jsx
 import { Outlet, useNavigate } from "react-router";
 
 const ProtectedRoutes = ({ requireRole }) => {
@@ -7,17 +7,13 @@ const ProtectedRoutes = ({ requireRole }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If no user, redirect to login
     if (!user) {
       navigate("/login");
-    } 
-    // If user role not allowed, redirect to unauthorized
-    else if (requireRole && !requireRole.includes(user.role)) {
+    } else if (requireRole && !requireRole.includes(user.role)) {
       navigate("/unauthorized");
     }
   }, [user, requireRole, navigate]);
 
-  // Render only if user exists and role is allowed
   if (!user) return null;
   if (requireRole && !requireRole.includes(user.role)) return null;
 

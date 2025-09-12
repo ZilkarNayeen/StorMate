@@ -1,10 +1,8 @@
 
-
 import React, { useState } from "react"; 
-import { useAuth } from "../context/AuthContext";
-import { FaUser, FaLock } from 'react-icons/fa';
+import { useAuth } from "../context/AuthContext.jsx";
+import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router"; 
-import axios from 'axios'; 
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -14,39 +12,42 @@ const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate(); 
 
-    const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    console.log('Submitting with:', { email, password });
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-    // Client-side validation to prevent empty requests
-    if (!email || !password) {
-        setError('Please enter both email and password.');
-        setLoading(false);
-        return; // Stop the function here
-    }
+        // Hardcoded admin credentials
+        const adminCredentials = {
+            email: "admin@gmail.com",
+            password: "admin123",
+            role: "admin",
+            name: "Admin User"
+        };
 
-    try {
-        const response = await axios.post('http://localhost:5713/api/auth/login', { email, password });
-        
-        if (response.data.success) {
-            await login(response.data.user, response.data.token);
-            if (response.data.user.role === 'admin') {
-                navigate('/admin-dashboard');
-            } else {
-                navigate('/customer-dashboard');
-            }
-        } else {
-            setError(response.data.message); 
+        // Hardcoded customer credentials
+        const customerCredentials = {
+            email: "customer@example.com",
+            password: "customer123",
+            role: "user",
+            name: "Customer User"
+        };
+
+        // Check credentials
+        if (email === adminCredentials.email && password === adminCredentials.password) {
+            login(adminCredentials);
+            navigate("/admin-dashboard");
+        } 
+        else if (email === customerCredentials.email && password === customerCredentials.password) {
+            login(customerCredentials);
+            navigate("/dashboard");
+        } 
+        else {
+            setError("Invalid email or password.");
         }
-    } catch (err) {
-        setError(err.response?.data?.message || "Failed to login. Please check your credentials and try again.");
-        console.error("Login error:", err);
-    } finally {
+
         setLoading(false);
-    }
-};
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-700 to-blue-900 p-4">
@@ -57,12 +58,15 @@ const Login = () => {
                 <h2 className="text-2xl font-bold text-center text-gray-700 mb-8">
                     Login
                 </h2>
+
                 {error && (
                     <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">
                         {error}
                     </div>
                 )}
+
                 <form className="space-y-6" onSubmit={handleSubmit}>
+                    {/* Email input */}
                     <div className="relative">
                         <label htmlFor="email" className="sr-only">Email</label>
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -72,12 +76,14 @@ const Login = () => {
                             type="email"
                             id="email"
                             name="email"
-                            required
-                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
+                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                            required
                         />
                     </div>
+
+                    {/* Password input */}
                     <div className="relative">
                         <label htmlFor="password" className="sr-only">Password</label>
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -87,12 +93,13 @@ const Login = () => {
                             type="password"
                             id="password"
                             name="password"
-                            required
-                            onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
+                            onChange={(e) => setPassword(e.target.value)}
                             className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                            required
                         />
                     </div>
+
                     <button
                         type="submit"
                         className="w-full bg-blue-600 text-white font-bold py-3 rounded-full shadow-lg shadow-blue-500/50 hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1"
