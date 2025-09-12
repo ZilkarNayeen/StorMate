@@ -67,7 +67,7 @@ const ItemTransaction = () => {
           name="itemId"
           value={form.itemId}
           onChange={handleChange}
-          placeholder="Item ID / SKU"
+          placeholder="Item Name or SKU"
           className="border p-2 rounded"
           required
         />
@@ -94,6 +94,12 @@ const ItemTransaction = () => {
           className="border p-2 rounded"
           required
         />
+
+        {/* Auto-calculated total */}
+        <div className="text-lg font-bold">
+          Total: ${form.price * form.quantity}
+        </div>
+
         <input
           name="note"
           value={form.note}
@@ -119,7 +125,7 @@ const ItemTransaction = () => {
       <table className="min-w-full border mb-6">
         <thead>
           <tr className="border-b bg-gray-100">
-            <th className="p-2 text-left">Item ID</th>
+            <th className="p-2 text-left">Item</th>
             <th className="p-2 text-left">Type</th>
             <th className="p-2 text-left">Qty</th>
             <th className="p-2 text-left">Price</th>
@@ -149,7 +155,7 @@ const ItemTransaction = () => {
       {selectedTransaction && (
         <div className="p-4 border rounded shadow bg-gray-50">
           <h2 className="text-xl font-bold mb-2">Transaction Receipt</h2>
-          <p><strong>Item ID:</strong> {selectedTransaction.itemId}</p>
+          <p><strong>Item:</strong> {selectedTransaction.itemId}</p>
           <p><strong>Type:</strong> {selectedTransaction.type}</p>
           <p><strong>Quantity:</strong> {selectedTransaction.quantity}</p>
           <p><strong>Price per item:</strong> ${selectedTransaction.price || 0}</p>

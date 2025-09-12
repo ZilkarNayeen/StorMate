@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
-// ✅ Login route (admin hardcoded + normal user login)
+// Login route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -20,12 +21,14 @@ router.post('/login', async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
-    if (user.password !== password) return res.status(401).json({ error: "Invalid credentials" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
     return res.json({
       name: user.name,
       email: user.email,
-      role: "user",
+      role: user.role, // admin or customer
       token: "fake-user-token"
     });
   } catch (err) {

@@ -15,6 +15,8 @@ const Sidebar = () => {
     { name: "Suppliers", path: "/admin-dashboard/suppliers", icon: <FaTruck />, isParent: false },
     { name: "Transactions", path: "/admin-dashboard/transactions", icon: <FaUsers />, isParent: false },
     { name: "Logout", path: "/logout", icon: <FaSignOutAlt />, isParent: false },
+    {name: "Users", path: "/admin-dashboard/users", icon:<FaUsers />, isParent: false},
+
   ];
 
   const handleLogoutClick = (e) => {
