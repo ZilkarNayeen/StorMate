@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     if (savedUser) setUser(savedUser);
   }, []);
 
-  // Login function (for example)
+  // Login function
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token"); // optional if you use token
   };
 
   return (
