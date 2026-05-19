@@ -1,12 +1,13 @@
 import express from "express";
 import Category from "../models/Category.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // GET all categories
-router.get("/", async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
-    const categories = await Category.find().sort({ name: 1 });
+    const categories = await Category.find({ businessId: req.user.businessId }).sort({ name: 1 });
     res.json(categories);
   } catch (err) {
     console.error("Error fetching categories:", err);
@@ -15,7 +16,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST a new category
-router.post("/add", async (req, res) => {
+router.post("/add", protect, async (req, res) => {
   const { name } = req.body;
 
   if (!name?.trim()) {
@@ -23,13 +24,13 @@ router.post("/add", async (req, res) => {
   }
 
   try {
-    // Check if already exists
-    const exists = await Category.findOne({ name: name.trim() });
+    // Check if already exists in this business
+    const exists = await Category.findOne({ name: name.trim(), businessId: req.user.businessId });
     if (exists) {
       return res.status(409).json({ error: "Category already exists" });
     }
 
-    const category = new Category({ name: name.trim() });
+    const category = new Category({ name: name.trim(), businessId: req.user.businessId });
     await category.save();
     res.status(201).json(category);
   } catch (err) {
@@ -39,9 +40,9 @@ router.post("/add", async (req, res) => {
 });
 
 // DELETE a category
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", protect, async (req, res) => {
   try {
-    const deleted = await Category.findByIdAndDelete(req.params.id);
+    const deleted = await Category.findOneAndDelete({ _id: req.params.id, businessId: req.user.businessId });
     if (!deleted) {
       return res.status(404).json({ error: "Category not found" });
     }

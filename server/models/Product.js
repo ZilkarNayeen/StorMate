@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
   stock: { type: Number, required: true, default: 0 },
   serialNo: { type: String, required: true, trim: true },
   supplier: { type: String },
+  businessId: { type: mongoose.Schema.Types.ObjectId, ref: "Business", required: true },
   createdAt: { type: Date, default: Date.now },
 });
 

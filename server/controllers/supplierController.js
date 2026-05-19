@@ -13,6 +13,7 @@ const addSupplier = async (req, res) => {
 
     const existingSupplier = await SupplierModel.findOne({
       $or: [{ email }, { number }],
+      businessId: req.user.businessId,
     });
 
     if (existingSupplier) {
@@ -21,7 +22,7 @@ const addSupplier = async (req, res) => {
         .json({ success: false, message: "Supplier already exists." });
     }
 
-    const newSupplier = new SupplierModel({ name, email, number, address });
+    const newSupplier = new SupplierModel({ name, email, number, address, businessId: req.user.businessId });
     await newSupplier.save();
 
     return res
@@ -36,7 +37,7 @@ const addSupplier = async (req, res) => {
 // Get All Suppliers
 const getSuppliers = async (req, res) => {
   try {
-    const suppliers = await SupplierModel.find().sort({ createdAt: -1 });
+    const suppliers = await SupplierModel.find({ businessId: req.user.businessId }).sort({ createdAt: -1 });
     return res.status(200).json({ success: true, suppliers });
   } catch (error) {
     console.error("Error fetching suppliers:", error);
@@ -47,7 +48,7 @@ const getSuppliers = async (req, res) => {
 // Delete Supplier
 const deleteSupplier = async (req, res) => {
   try {
-    const deleted = await SupplierModel.findByIdAndDelete(req.params.id);
+    const deleted = await SupplierModel.findOneAndDelete({ _id: req.params.id, businessId: req.user.businessId });
     if (!deleted) {
       return res.status(404).json({ success: false, message: "Supplier not found" });
     }

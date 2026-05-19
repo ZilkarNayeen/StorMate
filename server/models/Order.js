@@ -8,15 +8,18 @@ const orderItemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
-    orderNumber: { type: String, required: true, unique: true },
+    orderNumber: { type: String, required: true },
     type: { type: String, enum: ["sales", "purchase"], required: true },
     customerSupplier: { type: String, required: true },
     items: [orderItemSchema],
     totalAmount: { type: Number, required: true },
     expectedDate: { type: Date },
     notes: { type: String },
+    businessId: { type: mongoose.Schema.Types.ObjectId, ref: "Business", required: true },
   },
   { timestamps: true }
 );
+
+orderSchema.index({ orderNumber: 1, businessId: 1 }, { unique: true });
 
 export default mongoose.model("Order", orderSchema);

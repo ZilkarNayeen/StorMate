@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const Sidebar = () => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const menuitem = [
@@ -15,8 +15,7 @@ const Sidebar = () => {
     { name: "Suppliers", path: "/admin-dashboard/suppliers", icon: <FaTruck />, isParent: false },
     { name: "Transactions", path: "/admin-dashboard/transactions", icon: <FaUsers />, isParent: false },
     { name: "Logout", path: "/logout", icon: <FaSignOutAlt />, isParent: false },
-    {name: "Users", path: "/admin-dashboard/users", icon:<FaUsers />, isParent: false},
-
+    { name: "Users", path: "/admin-dashboard/users", icon: <FaUsers />, isParent: false },
   ];
 
   const handleLogoutClick = (e) => {
@@ -24,6 +23,13 @@ const Sidebar = () => {
     logout();
     navigate("/login"); // redirect to login
   };
+
+  const filteredMenuItems = menuitem.filter(item => {
+    if (item.name === "Users") {
+      return user && (user.role === "admin" || user.role === "superadmin");
+    }
+    return true;
+  });
 
   return (
     <div className='flex flex-col h-screen p-4 bg-gray-950 text-gray-300 shadow-xl w-16 md:w-64 fixed transition-all duration-300 ease-in-out'>
@@ -33,7 +39,7 @@ const Sidebar = () => {
       </div>
       <nav className='flex-1'>
         <ul className='space-y-4'>
-          {menuitem.map((item) => (
+          {filteredMenuItems.map((item) => (
             <li key={item.name}>
               {item.name === "Logout" ? (
                 <button

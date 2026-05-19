@@ -1,8 +1,12 @@
 import express from "express";
-import { addSupplier, getSuppliers } from "../controllers/supplierController.js";
+import { addSupplier, getSuppliers, deleteSupplier } from "../controllers/supplierController.js";
 import SupplierModel from "../models/Suppliers.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+// Protect all routes
+router.use(protect);
 
 // GET all suppliers
 router.get("/", getSuppliers);
@@ -23,6 +27,7 @@ router.put("/:id", async (req, res) => {
     // Check for duplicates (optional)
     const existing = await SupplierModel.findOne({
       $or: [{ email }, { number }],
+      businessId: req.user.businessId,
       _id: { $ne: req.params.id },
     });
 
@@ -30,8 +35,8 @@ router.put("/:id", async (req, res) => {
       return res.status(400).json({ success: false, message: "Supplier with this email or number already exists" });
     }
 
-    const updatedSupplier = await SupplierModel.findByIdAndUpdate(
-      req.params.id,
+    const updatedSupplier = await SupplierModel.findOneAndUpdate(
+      { _id: req.params.id, businessId: req.user.businessId },
       { name, email, number, address },
       { new: true }
     );
@@ -48,17 +53,6 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE a supplier
-router.delete("/:id", async (req, res) => {
-  try {
-    const deleted = await SupplierModel.findByIdAndDelete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: "Supplier not found" });
-    }
-    res.json({ success: true, message: "Supplier deleted" });
-  } catch (err) {
-    console.error("Error deleting supplier:", err);
-    res.status(500).json({ error: "Failed to delete supplier" });
-  }
-});
+router.delete("/:id", deleteSupplier);
 
 export default router;

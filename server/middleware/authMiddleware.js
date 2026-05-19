@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import User from "../models/Users.js";
 
 // Middleware to protect routes (requires valid token)
 export const protect = async (req, res, next) => {
@@ -36,7 +36,7 @@ export const protect = async (req, res, next) => {
 
 // Middleware to allow only admin users
 export const adminOnly = (req, res, next) => {
-    if (req.user && req.user.role === "admin") {
+    if (req.user && (req.user.role === "admin" || req.user.role === "superadmin")) {
         next();
     } else {
         res.status(403).json({ success: false, message: "Admin access required" });

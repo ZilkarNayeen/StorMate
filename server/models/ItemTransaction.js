@@ -11,6 +11,8 @@ const transactionSchema = new mongoose.Schema(
     quantity: { type: Number, required: true }, // + for receipt, - for dispense
     note: { type: String },
     user: { type: String }, // optional
+    price: { type: Number, default: 0 },
+    businessId: { type: mongoose.Schema.Types.ObjectId, ref: "Business", required: true },
   },
   { timestamps: true }
 );

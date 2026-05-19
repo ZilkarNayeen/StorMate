@@ -1,40 +1,53 @@
-const express = require('express');
+import express from "express";
+import User from "../models/Users.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const User = require('../models/User');
 
-// Login route
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  // --- Hardcoded Admin ---
-  if (email === "admin@gmail.com" && password === "admin") {
-    return res.json({
-      name: "Admin",
-      email: "admin@gmail.com",
-      role: "admin",
-      token: "fake-admin-token"
-    });
-  }
-
-  // --- Normal user login ---
+// GET all users (Admin only)
+router.get("/", protect, adminOnly, async (req, res) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
-
-    return res.json({
-      name: user.name,
-      email: user.email,
-      role: user.role, // admin or customer
-      token: "fake-user-token"
-    });
-  } catch (err) {
-    console.error("Login error:", err);
-    return res.status(500).json({ error: "Server error" });
+    const filter = req.user.role === "superadmin" ? {} : { businessId: req.user.businessId };
+    const users = await User.find(filter, "-password"); // Exclude passwords from return
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error fetching users" });
   }
 });
 
-module.exports = router;
+// POST create a user (Admin only)
+router.post("/create", protect, adminOnly, async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email, and password are required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const newUser = new User({
+      name,
+      email,
+      password,
+      role: role || "customer",
+      businessId: req.user.businessId
+    });
+
+    await newUser.save();
+    
+    // Return the new user without password
+    const userResponse = newUser.toObject();
+    delete userResponse.password;
+    
+    res.status(201).json({ success: true, user: userResponse });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Server error creating user" });
+  }
+});
+
+export default router;

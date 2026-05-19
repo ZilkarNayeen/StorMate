@@ -1,8 +1,8 @@
-
 import React, { useState } from "react"; 
 import { useAuth } from "../context/AuthContext.jsx";
 import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router"; 
+import axios from "axios";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -12,41 +12,38 @@ const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate(); 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        // Hardcoded admin credentials
-        const adminCredentials = {
-            email: "admin@gmail.com",
-            password: "admin123",
-            role: "admin",
-            name: "Admin User"
-        };
-
-        // Hardcoded customer credentials
-        const customerCredentials = {
-            email: "customer@example.com",
-            password: "customer123",
-            role: "user",
-            name: "Customer User"
-        };
-
-        // Check credentials
-        if (email === adminCredentials.email && password === adminCredentials.password) {
-            login(adminCredentials);
-            navigate("/admin-dashboard");
-        } 
-        else if (email === customerCredentials.email && password === customerCredentials.password) {
-            login(customerCredentials);
-            navigate("/dashboard");
-        } 
-        else {
-            setError("Invalid email or password.");
+        try {
+            // Call the real backend login endpoint
+            const res = await axios.post("http://localhost:5713/api/auth/login", { email, password });
+            
+            if (res.data.success) {
+                // Save user and token
+                const userWithToken = {
+                    ...res.data.user,
+                    token: res.data.token
+                };
+                login(userWithToken, res.data.token);
+                
+                // Redirect based on role
+                if (["admin", "superadmin", "staff"].includes(res.data.user.role)) {
+                    navigate("/admin-dashboard");
+                } else {
+                    navigate("/customer/dashboard");
+                }
+            } else {
+                setError(res.data.message || "Invalid email or password.");
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+            setError(err.response?.data?.message || "Invalid email or password.");
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (

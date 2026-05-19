@@ -3,7 +3,7 @@ import Order from "../models/Order.js";
 // GET all orders
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const orders = await Order.find({ businessId: req.user.businessId }).sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -27,8 +27,8 @@ export const createOrder = async (req, res) => {
 
     const totalAmount = mappedItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
 
-    // Generate unique orderNumber
-    let lastOrder = await Order.findOne().sort({ createdAt: -1 });
+    // Generate unique orderNumber per business
+    let lastOrder = await Order.findOne({ businessId: req.user.businessId }).sort({ createdAt: -1 });
     let lastNumber = 0;
     if (lastOrder && lastOrder.orderNumber) {
       const match = lastOrder.orderNumber.match(/\d+$/);
@@ -44,6 +44,7 @@ export const createOrder = async (req, res) => {
       orderNumber,
       expectedDate,
       notes,
+      businessId: req.user.businessId,
     });
 
     await order.save();
@@ -57,7 +58,7 @@ export const createOrder = async (req, res) => {
 // UPDATE order
 export const updateOrder = async (req, res) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const order = await Order.findOneAndUpdate({ _id: req.params.id, businessId: req.user.businessId }, req.body, { new: true });
     if (!order) return res.status(404).json({ message: "Order not found" });
     res.json(order);
   } catch (err) {
@@ -68,7 +69,7 @@ export const updateOrder = async (req, res) => {
 // DELETE order
 export const deleteOrder = async (req, res) => {
   try {
-    const order = await Order.findByIdAndDelete(req.params.id);
+    const order = await Order.findOneAndDelete({ _id: req.params.id, businessId: req.user.businessId });
     if (!order) return res.status(404).json({ message: "Order not found" });
     res.json({ message: "Order deleted" });
   } catch (err) {
