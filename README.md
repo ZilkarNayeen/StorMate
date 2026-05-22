@@ -57,19 +57,3 @@ MONGO_URI=mongodb://localhost:27017/storemate
 JWT_SECRET=your_custom_cryptographic_signing_key
 PORT=5713
 EOF
-
-Usage
-To boot both the backend API server and the React frontend client concurrently in a hot-reloading development state, execute the following commands in separate terminals:
-
-Terminal 1 (Backend API):
-
-Bash
-npm run dev
-Terminal 2 (Frontend Client UI):
-
-Bash
-cd frontend && npm start
-
-
-
-React – A declarative component runtime engine driving the client-side single-page application experience.
