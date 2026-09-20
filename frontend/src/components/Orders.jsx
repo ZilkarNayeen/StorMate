@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../utils/api.js";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -18,7 +18,7 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5713/api/orders");
+      const res = await api.get("/orders");
       setOrders(res.data);
     } catch (err) {
       console.error(err);
@@ -45,7 +45,7 @@ const Orders = () => {
 
   const saveOrder = async () => {
     try {
-      await axios.post("http://localhost:5713/api/orders", newOrder);
+      await api.post("/orders", newOrder);
       fetchOrders();
       setShowModal(false);
       setNewOrder({
@@ -62,7 +62,7 @@ const Orders = () => {
 
   const deleteOrder = async (id) => {
     try {
-      await axios.delete(`http://localhost:5713/api/orders/${id}`);
+      await api.delete(`/orders/${id}`);
       fetchOrders();
     } catch (err) {
       console.error(err);

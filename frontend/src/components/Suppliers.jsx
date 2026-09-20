@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../utils/api.js";
 
 const Suppliers = () => {
   const [addEditModal, setAddEditModal] = useState(false);
@@ -17,14 +17,10 @@ const Suppliers = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem("pos-token");
-
   // Fetch suppliers
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get("http://localhost:5713/api/suppliers", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/suppliers");
       if (res.data.success) setSuppliers(res.data.suppliers);
     } catch (err) {
       console.error("Error fetching suppliers:", err);
@@ -56,18 +52,10 @@ const Suppliers = () => {
       let response;
       if (editMode) {
         // Edit supplier
-        response = await axios.put(
-          `http://localhost:5713/api/suppliers/${editId}`,
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        response = await api.put(`/suppliers/${editId}`, formData);
       } else {
         // Add supplier
-        response = await axios.post(
-          "http://localhost:5713/api/suppliers/add",
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        response = await api.post("/suppliers/add", formData);
       }
 
       if (response.data.success) {
@@ -102,9 +90,7 @@ const Suppliers = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this supplier?")) return;
     try {
-      const res = await axios.delete(`http://localhost:5713/api/suppliers/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.delete(`/suppliers/${id}`);
       if (res.data.success) {
         fetchSuppliers();
       } else {

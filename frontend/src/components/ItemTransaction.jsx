@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
-const API_BASE = "http://localhost:5713/api/itemTransaction";
+import api from "../utils/api.js";
 
 const ItemTransaction = () => {
   const [transactions, setTransactions] = useState([]);
@@ -23,7 +21,7 @@ const ItemTransaction = () => {
 
   const fetchTransactions = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/transactions`);
+      const res = await api.get("/itemTransaction/transactions");
       setTransactions(res.data);
     } catch (err) {
       console.error(err);
@@ -45,8 +43,7 @@ const ItemTransaction = () => {
     setError("");
 
     try {
-      let url = `${API_BASE}/${form.type}`;
-      const res = await axios.post(url, form);
+      const res = await api.post(`/itemTransaction/${form.type}`, form);
       setTransactions(prev => [res.data, ...prev]);
       setForm({ itemId: "", type: "receipt", quantity: 0, note: "", user: "", price: 0 });
     } catch (err) {

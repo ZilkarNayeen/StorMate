@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext.jsx";
-
-const API_BASE = "http://localhost:5713/api/users";
+import api from "../utils/api.js";
 
 const AdminUsers = () => {
-  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "customer" });
   const [loading, setLoading] = useState(false);
@@ -17,7 +13,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(API_BASE, { headers: { Authorization: `Bearer ${user.token}` } });
+      const res = await api.get("/users");
       setUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -34,7 +30,7 @@ const AdminUsers = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(API_BASE + "/create", form, { headers: { Authorization: `Bearer ${user.token}` } });
+      const res = await api.post("/users/create", form);
       setUsers(prev => [...prev, res.data.user]);
       setForm({ name: "", email: "", password: "", role: "customer" });
     } catch (err) {

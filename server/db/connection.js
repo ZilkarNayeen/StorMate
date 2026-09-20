@@ -1,8 +1,12 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.Mongo_URI);
+    const mongoUri = process.env.Mongo_URI || process.env.MONGO_URI || "mongodb://127.0.0.1:27017/storemate";
+    await mongoose.connect(mongoUri);
     console.log("MongoDB connected successfully");
   } catch (error) {
     console.error("MongoDB connection failed:", error.message);

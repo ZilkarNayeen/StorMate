@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../utils/api.js";
 
 const Categories = () => {
   const [category, setCategory] = useState("");
@@ -8,13 +8,11 @@ const Categories = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const API_BASE = "http://localhost:5713/api/categories";
-
   // Fetch all categories
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(API_BASE);
+      const res = await api.get("/categories");
       setCategories(res.data);
     } catch (err) {
       console.error("Error fetching categories:", err);
@@ -40,7 +38,7 @@ const Categories = () => {
     }
 
     try {
-      const res = await axios.post(`${API_BASE}/add`, { name: category });
+      const res = await api.post("/categories/add", { name: category });
       setSuccess("Category added successfully.");
       setCategory("");
       setCategories((prev) => [...prev, res.data]);
@@ -53,7 +51,7 @@ const Categories = () => {
   // Delete a category
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_BASE}/${id}`);
+      await api.delete(`/categories/${id}`);
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
       setSuccess("Category deleted.");
     } catch (err) {

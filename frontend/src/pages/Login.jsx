@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router"; 
-import axios from "axios";
+import api from "../utils/api.js";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -18,8 +18,8 @@ const Login = () => {
         setLoading(true);
 
         try {
-            // Call the real backend login endpoint
-            const res = await axios.post("http://localhost:5713/api/auth/login", { email, password });
+            // Call backend login endpoint using api helper
+            const res = await api.post("/auth/login", { email, password });
             
             if (res.data.success) {
                 // Save user and token

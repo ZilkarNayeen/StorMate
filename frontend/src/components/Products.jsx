@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../utils/api.js";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -24,7 +24,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5713/api/products");
+      const res = await api.get("/products");
       if (res.data.success && Array.isArray(res.data.products)) {
         setProducts(res.data.products);
       } else {
@@ -68,24 +68,11 @@ const Products = () => {
     setError("");
     setLoading(true);
 
-    const token = localStorage.getItem("pos-token");
-    if (!token) {
-      setError("You must be logged in");
-      setLoading(false);
-      return;
-    }
-
     try {
       if (editProduct) {
-        await axios.put(
-          `http://localhost:5713/api/products/${editProduct._id}`,
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await api.put(`/products/${editProduct._id}`, formData);
       } else {
-        await axios.post("http://localhost:5713/api/products/add", formData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await api.post("/products/add", formData);
       }
 
       fetchProducts();
@@ -99,12 +86,9 @@ const Products = () => {
   };
 
   const handleDelete = async (id) => {
-    const token = localStorage.getItem("pos-token");
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      await axios.delete(`http://localhost:5713/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/products/${id}`);
       fetchProducts();
     } catch (err) {
       console.error(err);
@@ -122,13 +106,12 @@ const Products = () => {
 
   const submitStockChange = async () => {
     if (!stockProduct || stockQuantity <= 0) return;
-    const token = localStorage.getItem("pos-token");
     try {
-      const url =
+      const endpoint =
         stockType === "add"
-          ? `http://localhost:5713/api/products/add-stock/${stockProduct._id}`
-          : `http://localhost:5713/api/products/remove-stock/${stockProduct._id}`;
-      await axios.put(url, { quantity: stockQuantity }, { headers: { Authorization: `Bearer ${token}` } });
+          ? `/products/add-stock/${stockProduct._id}`
+          : `/products/remove-stock/${stockProduct._id}`;
+      await api.put(endpoint, { quantity: stockQuantity });
       fetchProducts();
       setStockModalOpen(false);
     } catch (err) {
