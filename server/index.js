@@ -9,12 +9,16 @@ import productRoutes from "./routes/product.js";
 import orderRoutes from "./routes/order.js";
 import itemTransactionRoutes from "./routes/itemTransaction.js";
 import userRoutes from "./routes/users.js";
+import { setupSwagger } from "./swagger.js";
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Setup Swagger API docs
+setupSwagger(app);
 
 // Health check
 app.get("/api/health", (req, res) => res.json({ status: "ok", timestamp: new Date() }));

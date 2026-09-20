@@ -19,7 +19,11 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       const res = await api.get("/orders");
-      setOrders(res.data);
+      if (res.data.success && Array.isArray(res.data.orders)) {
+        setOrders(res.data.orders);
+      } else if (Array.isArray(res.data)) {
+        setOrders(res.data);
+      }
     } catch (err) {
       console.error(err);
     }
