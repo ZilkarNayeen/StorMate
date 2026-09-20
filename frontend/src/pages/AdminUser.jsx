@@ -14,7 +14,11 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       const res = await api.get("/users");
-      setUsers(res.data);
+      if (res.data.success && Array.isArray(res.data.users)) {
+        setUsers(res.data.users);
+      } else if (Array.isArray(res.data)) {
+        setUsers(res.data);
+      }
     } catch (err) {
       console.error(err);
     }

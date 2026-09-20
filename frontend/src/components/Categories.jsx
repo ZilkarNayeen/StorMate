@@ -13,7 +13,11 @@ const Categories = () => {
     setLoading(true);
     try {
       const res = await api.get("/categories");
-      setCategories(res.data);
+      if (res.data.success && Array.isArray(res.data.categories)) {
+        setCategories(res.data.categories);
+      } else if (Array.isArray(res.data)) {
+        setCategories(res.data);
+      }
     } catch (err) {
       console.error("Error fetching categories:", err);
       setError("Failed to load categories.");

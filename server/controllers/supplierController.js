@@ -19,7 +19,7 @@ const addSupplier = async (req, res) => {
     if (existingSupplier) {
       return res
         .status(400)
-        .json({ success: false, message: "Supplier already exists." });
+        .json({ success: false, message: "Supplier with this email or number already exists." });
     }
 
     const newSupplier = new SupplierModel({ name, email, number, address, businessId: req.user.businessId });
@@ -27,7 +27,7 @@ const addSupplier = async (req, res) => {
 
     return res
       .status(201)
-      .json({ success: true, message: "Supplier added successfully!" });
+      .json({ success: true, message: "Supplier added successfully!", supplier: newSupplier });
   } catch (error) {
     console.error("Error adding supplier:", error);
     return res.status(500).json({ success: false, message: "Server error" });
@@ -41,6 +41,42 @@ const getSuppliers = async (req, res) => {
     return res.status(200).json({ success: true, suppliers });
   } catch (error) {
     console.error("Error fetching suppliers:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Update Supplier
+const updateSupplier = async (req, res) => {
+  try {
+    const { name, email, number, address } = req.body;
+
+    if (!name || !email || !number || !address) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    const existing = await SupplierModel.findOne({
+      $or: [{ email }, { number }],
+      businessId: req.user.businessId,
+      _id: { $ne: req.params.id },
+    });
+
+    if (existing) {
+      return res.status(400).json({ success: false, message: "Supplier with this email or number already exists" });
+    }
+
+    const updatedSupplier = await SupplierModel.findOneAndUpdate(
+      { _id: req.params.id, businessId: req.user.businessId },
+      { name, email, number, address },
+      { new: true }
+    );
+
+    if (!updatedSupplier) {
+      return res.status(404).json({ success: false, message: "Supplier not found" });
+    }
+
+    return res.status(200).json({ success: true, message: "Supplier updated", supplier: updatedSupplier });
+  } catch (err) {
+    console.error("Error updating supplier:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -59,4 +95,4 @@ const deleteSupplier = async (req, res) => {
   }
 };
 
-export { addSupplier, getSuppliers, deleteSupplier };
+export { addSupplier, getSuppliers, updateSupplier, deleteSupplier };

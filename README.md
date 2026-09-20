@@ -1,66 +1,169 @@
-# StorMate _(stormate)_
+# StorMate: Enterprise Multi-Tenant Inventory & Order Platform
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)
-![Standard Readme](https://img.shields.io/badge/standard%20readme-yes-brightgreen?style=flat-square)
-![Node Version](https://img.shields.io/badge/node-%3E%3D%2018.0.0-blue.svg?style=flat-square)
+![Node Version](https://img.shields.io/badge/Node-%3E%3D%2018.0.0-blue.svg?style=flat-square)
+![React Version](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg?style=flat-square)
+![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)
 
-A modern multi-tenant inventory and order management web platform built with Node.js, Express, MongoDB, and React.
-
-## Table of Contents
-
-- [Security](#security)
-- [Background](#background)
-- [Install](#install)
-- [Usage](#usage)
-- [Extra Sections](#extra-sections)
-- [API](#api)
-- [Maintainers](#maintainers)
-- [Thanks](#thanks)
-- [Contributing](#contributing)
-- [License](#license)
-- [Definitions](#definitions)
+**StorMate** is an enterprise-grade multi-tenant inventory, supplier, and order management web platform built using Node.js, Express, MongoDB, and React. Engineered with logical data isolation, role-based access control (RBAC), cryptographic JWT authentication, and structuredRESTful APIs.
 
 ---
 
-## Security
+## 🌟 Academic & Portfolio Highlights
 
-The application enforces stateless authentication via JSON Web Tokens (JWT) coupled with customized cryptographic verification middleware (`protect`, `adminOnly`). Passwords undergo an irreversible salted transformation via `bcryptjs` using a work factor calculation metric of 10 prior to database persistence.
+Designed as a software engineering showcase for **MSc Computer Science** and **Master of Applied Computing (MAC)** graduate admissions:
 
-To ensure logical multi-tenant isolation, backend API route controllers bypass tenant identity variables supplied by the client interface; instead, the active `businessId` scope is extracted directly from the validated backend JWT payload to prevent ID-spoofing and parameter pollution. For production deployments, the application must be served over HTTPS, utilize Helmet middleware for HTTP header hardening, and implement rate-limiting protections.
-
----
-
-## Background
-
-StorMate was engineered to provide small‑to‑medium enterprises (MSMEs) with a single pane of glass for managing suppliers, products, and complex purchase order workflows. It abstracts away manual spreadsheets by introducing a structured, relational-style system on top of a scalable, non-relational MongoDB database layer.
-
-The project implements a logical data isolation model, routing separate corporate accounts through a single database cluster while structurally guaranteeing absolute partition privacy. This decoupled architecture optimizes shared server usage, demonstrating advanced database engineering principles, custom access middleware, and web scalability suitable for advanced computer science tracks and professional technical evaluations.
+* **Logical Multi-Tenant Architecture**: Enforces structural partition privacy across corporate accounts by binding tenant scope (`businessId`) directly to validated backend JWT payloads.
+* **Layered System Design**: Enforces separation of concerns using a decoupled `Routes` -> `Controllers` -> `Models` architectural pattern.
+* **Cryptographic Security Model**: Implements salted password hashing (`bcrypt`) and stateless token verification (`jsonwebtoken`) with role-based authorization guards.
+* **ACID & Schema Integrity**: Enforces database index uniqueness, schema validation constraints, and relational consistency across non-relational MongoDB collections.
 
 ---
 
-## Install
+## 📐 System Architecture
+
+```text
+               +----------------------------------+
+               |   React SPA (Vite / Tailwind)    |
+               +----------------------------------+
+                                |  HTTP / REST API
+                                v
+               +----------------------------------+
+               |  Express REST API Gateway        |
+               +----------------------------------+
+                  /             |              \
+                 v              v               v
+        +---------------+ +-----------+ +---------------+
+        | Auth Guard    | | CORS /    | | Tenant Scope  |
+        | Middleware    | | Security  | | Middleware    |
+        +---------------+ +-----------+ +---------------+
+                                |
+                                v
+               +----------------------------------+
+               |  Controller & Business Logic     |
+               +----------------------------------+
+                                |
+                                v
+               +----------------------------------+
+               |  MongoDB / Mongoose ORM Layer    |
+               +----------------------------------+
+```
+
+---
+
+## 🗄️ Database Entity-Relationship (ER) Model
+
+```text
+    +---------------+              +-----------------+
+    |   Business    | 1          * |      User       |
+    |---------------|--------------|-----------------|
+    | _id (PK)      |              | _id (PK)        |
+    | name          |              | email (UQ)      |
+    | email (UQ)    |              | role (RBAC)     |
+    | slug          |              | businessId (FK) |
+    +---------------+              +-----------------+
+        | 1                            | 1
+        |                              |
+        | *                            | *
+    +---------------+              +-----------------+
+    |    Product    |              | ItemTransaction |
+    |---------------|              |-----------------|
+    | _id (PK)      |              | _id (PK)        |
+    | serialNo (UQ) |              | type            |
+    | stock         |              | quantity        |
+    | price         |              | businessId (FK) |
+    | businessId(FK)|              +-----------------+
+    +---------------+
+```
+
+---
+
+## 📚 API Endpoints
+
+### 🔐 Authentication (`/api/auth`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Register new user account | No |
+| `POST` | `/api/auth/login` | Authenticate user & issue JWT | No |
+
+### 📦 Products (`/api/products`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/products` | Fetch all business products | Yes |
+| `POST` | `/api/products/add` | Create new product record | Yes |
+| `PUT` | `/api/products/:id` | Update product details | Yes |
+| `DELETE` | `/api/products/:id` | Delete product record | Yes |
+| `PUT` | `/api/products/add-stock/:id` | Increment product stock | Yes |
+| `PUT` | `/api/products/remove-stock/:id` | Decrement product stock | Yes |
+
+### 📁 Categories (`/api/categories`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/categories` | Fetch business categories | Yes |
+| `POST` | `/api/categories/add` | Add category | Yes |
+| `DELETE` | `/api/categories/:id` | Delete category | Yes |
+
+### 🤝 Suppliers (`/api/suppliers`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/suppliers` | Fetch business suppliers | Yes |
+| `POST` | `/api/suppliers/add` | Add new supplier | Yes |
+| `PUT` | `/api/suppliers/:id` | Update supplier info | Yes |
+| `DELETE` | `/api/suppliers/:id` | Delete supplier | Yes |
+
+### 📋 Orders (`/api/orders`)
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/orders` | List purchase & sales orders | Yes |
+| `POST` | `/api/orders` | Create purchase/sales order | Yes |
+| `DELETE` | `/api/orders/:id` | Delete order record | Yes |
+
+---
+
+## 🛠️ Local Installation & Setup Guide
 
 ### Prerequisites
+* **Node.js**: `>= 18.0.0`
+* **MongoDB**: Community Edition running locally (`mongodb://127.0.0.1:27017`) or active MongoDB Atlas connection URI.
 
-* [Node.js](https://nodejs.org/) (>= Version 18.0.0)
-* [MongoDB Community Server](https://www.mongodb.com/try/download/community) running locally or an active MongoDB Atlas cloud URI.
-
-### Setup Instructions
-
-Clone the repository, navigate to the project root directory, and execute the installation commands:
+### Quickstart
 
 ```bash
-# Install core server dependencies
-npm install
+# 1. Clone repository
+git clone https://github.com/ZilkarNayeen/StorMate.git
+cd StorMate
 
-# Install client UI dependencies
+# 2. Install dependencies
+npm install
 cd frontend && npm install && cd ..
 
-# Generate your environmental configuration file
-cat > .env <<EOF
-MONGO_URI=mongodb://localhost:27017/storemate
-JWT_SECRET=your_custom_cryptographic_signing_key
+# 3. Create server environment configuration
+cat > server/.env <<EOF
 PORT=5713
+MONGO_URI=mongodb://127.0.0.1:27017/storemate
+JWT_SECRET=your_jwt_secret_key
 EOF
 
+# 4. Seed database with initial sample data
+cd server && node seed.js && cd ..
 
+# 5. Start Backend Server
+cd server && node index.js
+
+# 6. Start Frontend App (in a separate terminal)
+cd frontend && npm run dev
+```
+
+---
+
+## 🔒 Security & Tenant Isolation
+
+1. **Backend Verification**: Client-supplied tenant IDs are strictly ignored in request payloads. The API extracts `businessId` directly from decoded JWT tokens attached by the `protect` middleware.
+2. **Access Guards**: Role-based access control (`adminOnly`, `protect`) enforces multi-tiered privileges (`superadmin`, `admin`, `staff`, `customer`).
+3. **Database Guardrails**: Compound indexes enforce uniqueness per business (e.g. `{ serialNo: 1, businessId: 1 }`).
+
+---
+
+## 📄 License
+This project is open-source under the [MIT License](LICENSE).

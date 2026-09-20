@@ -1,53 +1,49 @@
-import CategoryModel from "../models/Category.js";
+import Category from "../models/Category.js";
 
-const addCategory = async(req,res)=>{
-    try{
-        console.log('Received request body:', req.body); // Check what data is being sent
-
-        const{categoryName,categoryDescription}= req.body;
-
-        // Ensure both fields exist before proceeding
-        if (!categoryName || !categoryDescription) {
-            console.log('Validation Error: Missing category name or description.');
-            return res.status(400).json({ success: false, message: 'Category name and description are required.' });
-        }
-
-        const existingCategory=await CategoryModel.findOne({categoryName});
-        if (existingCategory){
-            console.log('Validation Error: Category already exists.');
-            return res.status(400).json({success: false, message:'Already exists'});
-        }
-
-        const newCategory=new CategoryModel({
-            categoryName,
-            categoryDescription,
-        });
-
-        // Use a separate try/catch for the save operation to catch Mongoose errors
-        try {
-            await newCategory.save();
-            console.log('New category saved successfully!');
-            return res.status(201).json({success:true, message:'Added Successfully'});
-        } catch (saveError) {
-            console.error('Mongoose Save Error:', saveError); // <-- THIS LINE IS KEY
-            // The error message from Mongoose is in saveError.message
-            return res.status(500).json({ success: false, message: `Failed to save category: ${saveError.message}` });
-        }
-
-    } catch (error){
-        console.error('General Server Error in addCategory:', error);
-        return res.status(500).json({ success: false, message:'Server error'});
-    }
+// GET all categories for the authenticated business
+export const getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({ businessId: req.user.businessId }).sort({ name: 1 });
+    return res.status(200).json({ success: true, categories });
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+    return res.status(500).json({ success: false, message: "Failed to fetch categories" });
+  }
 };
-const getCategories= async(req,res)=>{
-    try{
-        const categories=await CategoryModel.find();
-        return res.status(200).json({success:true, categories});
 
-    }catch(error){
-        console.error('Error fetching categories:',error);
-         return res.status(500).json({success:false, message:"Server error"});
+// POST add a new category
+export const addCategory = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, message: "Category name is required" });
     }
-}
 
-export {addCategory, getCategories};
+    const existing = await Category.findOne({ name: name.trim(), businessId: req.user.businessId });
+    if (existing) {
+      return res.status(409).json({ success: false, message: "Category already exists" });
+    }
+
+    const category = new Category({ name: name.trim(), businessId: req.user.businessId });
+    await category.save();
+    return res.status(201).json({ success: true, message: "Category added successfully", category });
+  } catch (err) {
+    console.error("Error adding category:", err);
+    return res.status(500).json({ success: false, message: "Failed to add category" });
+  }
+};
+
+// DELETE a category
+export const deleteCategory = async (req, res) => {
+  try {
+    const deleted = await Category.findOneAndDelete({ _id: req.params.id, businessId: req.user.businessId });
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+    return res.status(200).json({ success: true, message: "Category deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting category:", err);
+    return res.status(500).json({ success: false, message: "Failed to delete category" });
+  }
+};
