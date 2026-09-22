@@ -1,5 +1,5 @@
 # Multi-stage Dockerfile for StorMate Node.js Backend Server
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
