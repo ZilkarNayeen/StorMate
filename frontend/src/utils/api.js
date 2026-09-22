@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://orange-ads-attack.loca.lt/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://stormate-8p52.onrender.com/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
