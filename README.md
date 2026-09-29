@@ -73,15 +73,6 @@ StorMate/
 
 See [Architecture](docs/architecture.md) and [Database Design](docs/database-design.md) for more detail.
 
-## Screenshots
-
-There are no product screenshots committed in the repository yet. Add reviewed screenshots under `docs/screenshots/` and link them here when available. Suggested views:
-
-| View | Screenshot |
-| --- | --- |
-| Dashboard | _Add `docs/screenshots/dashboard.png`_ |
-| Inventory | _Add `docs/screenshots/inventory.png`_ |
-| Orders | _Add `docs/screenshots/orders.png`_ |
 
 ## Installation
 
