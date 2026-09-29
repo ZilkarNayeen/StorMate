@@ -29,13 +29,16 @@ const ensureDemoData = async () => {
       slug: "techcorp",
     });
 
-    await User.create({
-      name: "Owner Superadmin",
-      email: "owner@storemate.com",
-      password: "ownersuperadmin",
-      address: "Owner HQ",
-      role: "superadmin",
-    });
+    const superadminExists = await User.findOne({ email: "owner@storemate.com" });
+    if (!superadminExists) {
+      await User.create({
+        name: "Owner Superadmin",
+        email: "owner@storemate.com",
+        password: "ownersuperadmin",
+        address: "Owner HQ",
+        role: "superadmin",
+      });
+    }
 
     const adminExists = await User.findOne({ email: "admin@techcorp.com" });
     if (!adminExists) {

@@ -1,99 +1,95 @@
 # StorMate
 
-A full-stack multi-tenant inventory and business management system designed for modern retail and operational teams.
+<p align="center">
+  <strong>Inventory, orders, and business operations in one multi-tenant workspace.</strong>
+</p>
 
-StorMate helps businesses manage products, suppliers, stock movement, orders, and users across multiple business accounts while keeping each tenant's data isolated and securely scoped.
+<p align="center">
+  <a href="https://stor-mate.vercel.app">Live application</a> ·
+  <a href="https://stormate-8p52.onrender.com/api-docs">API reference</a> ·
+  <a href="docs/architecture.md">Architecture</a>
+</p>
 
-## Why this project matters
+<p align="center">
+  <a href="https://github.com/ZilkarNayeen/StorMate/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
+  <img alt="Frontend" src="https://img.shields.io/badge/frontend-React%2019%20%2B%20Vite-61DAFB?logo=react&logoColor=20232A">
+  <img alt="Backend" src="https://img.shields.io/badge/backend-Node.js%20%2B%20Express-339933?logo=nodedotjs&logoColor=white">
+  <img alt="Database" src="https://img.shields.io/badge/database-MongoDB-47A248?logo=mongodb&logoColor=white">
+  <img alt="API" src="https://img.shields.io/badge/API-REST%20%7C%20OpenAPI-6BA539?logo=swagger&logoColor=white">
+</p>
 
-This project was built to solve a real business problem:
-- businesses need a clean way to manage inventory and stock
-- teams need role-based access control
-- owners want multi-business visibility without data leakage
-- operations need a simple dashboard for products, suppliers, and transactions
+StorMate is a full-stack inventory and business management application for teams that need to manage products, stock, suppliers, users, and orders. Its multi-tenant model scopes operational data to a business, while role-based access distinguishes platform-level administration from business operations.
 
-It is a strong portfolio project because it combines:
-- full-stack JavaScript development
-- authentication and authorization
-- multi-tenant architecture
-- database design and data modeling
-- business workflow logic
-- API-driven backend systems
+> **Project status:** StorMate is an actively developed portfolio project. Review the [security notes](#security-features) and configure production secrets and origins before using it with real business data.
 
-## Live demo
+## Overview
 
-Frontend: https://stor-mate.vercel.app
-Backend: https://stormate-8p52.onrender.com/api
+StorMate models a SaaS-style business hierarchy:
 
-## Tech stack
+- A **superadmin** provisions business administrators.
+- A **business admin** manages users and operations for their business.
+- **Staff** work with business inventory and operational records.
+- Business data is associated with a tenant identifier and accessed through authenticated workflows.
 
-- Frontend: React + Vite
-- Styling: Tailwind CSS
-- Backend: Node.js + Express
-- Database: MongoDB + Mongoose
-- Authentication: JWT + bcrypt
-- Deployment: Vercel + Render
+The hosted frontend and API are available at [stor-mate.vercel.app](https://stor-mate.vercel.app) and [stormate-8p52.onrender.com](https://stormate-8p52.onrender.com/api). Availability depends on the hosting services and deployed database state.
 
-## Core features
+## Features
 
-- Multi-tenant business architecture with business-scoped data access
-- Role-based access for superadmin, admin, staff, and customer
-- Product inventory and stock tracking
-- Supplier management
-- Order and transaction tracking
-- User creation with business-aware permissions
-- Protected routes and secure token-based auth
-- Dashboard-driven admin workflows
-- Responsive UI for operational use
+- **Business-aware access control** with superadmin, admin, staff, and customer roles
+- **Tenant-scoped operations** for business data
+- **Inventory management** for products and stock adjustments
+- **Order workflows** for sales and purchases
+- **Supplier and category management**
+- **User administration** with business-aware provisioning rules
+- **Item transaction tracking** for inventory activity
+- **JWT-protected API routes** and bcrypt password hashing
+- **Interactive API reference** served by Swagger UI
+- **Docker Compose** setup for the backend and MongoDB
 
-## Business role flow
+## Architecture
 
-This project follows a practical SaaS-style access model:
+The project is organized as a React single-page application backed by an Express REST API and MongoDB.
 
-- Superadmin creates business admins
-- Business admin creates staff and customers for their business
-- Staff manages inventory and transactions within their assigned business
-- Customers can be tracked as business users as needed
-
-## Project structure
-
-```bash
-StorMate/
-├── frontend/                # React + Vite frontend
-│   ├── src/
-│   ├── public/
-│   └── package.json
-├── server/                  # Express + MongoDB backend
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   ├── db/
-│   ├── seed.js
-│   ├── index.js
-│   └── package.json
-├── README.md
-├── package.json
-├── Dockerfile
-├── docker-compose.yml
-├── LICENSE
-└── .gitignore
+```mermaid
+flowchart LR
+    Browser[React + Vite frontend] -->|HTTP / JSON + bearer token| API[Express REST API]
+    API --> Auth[JWT authentication and role checks]
+    Auth --> Controllers[Route controllers]
+    Controllers --> Models[Mongoose models]
+    Models --> DB[(MongoDB)]
+    Controllers --> Tenant[Business-scoped data access]
 ```
 
-## Demo accounts
+**Request flow:** the frontend sends API requests through a shared Axios client. Protected routes validate the bearer token, then controller queries use the authenticated user's role and business context to perform operations.
 
-The app includes seeded demo accounts for local setup:
+```text
+StorMate/
+├── frontend/       React + Vite application
+├── server/         Express API, routes, controllers, models, middleware
+├── docs/           Architecture, database, deployment, security, portfolio notes
+├── Dockerfile      Backend container image
+└── docker-compose.yml
+```
 
-- Superadmin: owner@storemate.com / ownersuperadmin
-- Tech Corp Admin: admin@techcorp.com / admintech
-- Tech Corp Staff: staff@techcorp.com / stafftech
+See [Architecture](docs/architecture.md) and [Database Design](docs/database-design.md) for more detail.
 
-## Local setup
+## Screenshots
+
+There are no product screenshots committed in the repository yet. Add reviewed screenshots under `docs/screenshots/` and link them here when available. Suggested views:
+
+| View | Screenshot |
+| --- | --- |
+| Dashboard | _Add `docs/screenshots/dashboard.png`_ |
+| Inventory | _Add `docs/screenshots/inventory.png`_ |
+| Orders | _Add `docs/screenshots/orders.png`_ |
+
+## Installation
 
 ### Prerequisites
 
-- Node.js 18+
-- MongoDB running locally or a MongoDB Atlas connection
+- Node.js 20 or later recommended
+- npm
+- MongoDB running locally or a MongoDB Atlas connection string
 
 ### 1. Clone the repository
 
@@ -105,107 +101,157 @@ cd StorMate
 ### 2. Install dependencies
 
 ```bash
-npm install
-cd frontend && npm install && cd ..
-cd server && npm install && cd ..
+npm install --prefix server
+npm install --prefix frontend
 ```
 
 ### 3. Configure environment variables
 
-Create a `.env` file inside the `server` folder:
+Create `server/.env` using the [Environment Variables](#environment-variables) section. Create `frontend/.env` to point the frontend at your local API.
+
+### 4. Start the API
+
+```bash
+npm --prefix server start
+```
+
+The API connects to MongoDB at startup. The server also ensures demo account records exist if no superadmin is found; do not use demo credentials or automatic demo data initialization in a production deployment.
+
+### 5. Start the frontend
+
+```bash
+npm --prefix frontend run dev
+```
+
+Open the Vite URL printed in the terminal (typically `http://localhost:5173`). The API listens on `http://localhost:5713` by default; the health endpoint is `/api/health`.
+
+To create or refresh seed data explicitly, review `server/seed.js` and run:
+
+```bash
+npm --prefix server run seed
+```
+
+## Environment Variables
+
+### Backend: `server/.env`
+
+| Variable | Required | Description | Example |
+| --- | --- | --- | --- |
+| `PORT` | No | HTTP port; defaults to `5713` | `5713` |
+| `MONGO_URI` | Yes | MongoDB connection string | `mongodb://127.0.0.1:27017/storemate` |
+| `JWT_SECRET` | Yes | Secret used to sign and verify JWTs | Use a long, random secret |
+
+Example:
 
 ```env
 PORT=5713
 MONGO_URI=mongodb://127.0.0.1:27017/storemate
-JWT_SECRET=your_secure_jwt_secret
+JWT_SECRET=replace-with-a-long-random-secret
 ```
 
-### 4. Seed the database
+### Frontend: `frontend/.env`
+
+| Variable | Required | Description | Example |
+| --- | --- | --- | --- |
+| `VITE_API_BASE_URL` | Recommended | API base URL, including `/api` | `http://localhost:5713/api` |
+
+The frontend currently has a deployed API URL as its fallback. Set `VITE_API_BASE_URL` explicitly for local development, previews, and each deployment environment.
+
+Never commit `.env` files or production credentials. Any secret included in a `VITE_` variable is bundled into browser code and must be treated as public.
+
+## API Documentation
+
+Swagger UI is served by the backend at:
+
+- Local: `http://localhost:5713/api-docs`
+- Hosted: [`https://stormate-8p52.onrender.com/api-docs`](https://stormate-8p52.onrender.com/api-docs)
+
+The API base path is `/api`. The following route groups are registered:
+
+| Resource | Base path | Examples |
+| --- | --- | --- |
+| Health | `/api/health` | `GET /api/health` |
+| Authentication | `/api/auth` | `POST /api/auth/login` |
+| Categories | `/api/categories` | List and category management |
+| Suppliers | `/api/suppliers` | List and supplier management |
+| Products | `/api/products` | List, create, update, delete, stock changes |
+| Orders | `/api/orders` | List, create, update, delete |
+| Item transactions | `/api/itemTransaction` | Inventory transaction operations |
+| Users | `/api/users` | List users and create users (protected) |
+
+Protected endpoints expect a bearer token in the `Authorization` header:
+
+```http
+Authorization: Bearer <jwt>
+```
+
+The Swagger document currently describes a subset of the implemented routes. Treat the route handlers as the source of truth if an operation is not present in the interactive reference.
+
+## Docker Setup
+
+The included Compose file starts the backend and MongoDB. From the repository root:
 
 ```bash
-cd server
-node seed.js
+docker compose up --build
 ```
 
-### 5. Start the backend
+The API is exposed on `http://localhost:5713`; MongoDB is exposed on port `27017`. Data is persisted in the Compose-managed `mongodb_data` volume.
+
+Stop the services with:
 
 ```bash
-cd server
-npm start
+docker compose down
 ```
 
-### 6. Start the frontend
+To also remove the local database volume, run `docker compose down -v` (this permanently deletes the MongoDB data stored in that volume).
 
-```bash
-cd frontend
-npm run dev
-```
+**Important:** the checked-in Compose configuration uses a development JWT secret. Replace it with a unique secret for local use and never use that value in a public or production environment. Configure CORS and database network access appropriately before exposing services beyond localhost.
 
-Then open:
+## Deployment
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:5713/api
+The deployed project uses Vercel for the frontend and Render for the API. MongoDB can be hosted through MongoDB Atlas or another compatible managed service.
 
-## API overview
+### Frontend
 
-### Authentication
-- POST /api/auth/login
-- POST /api/auth/register
+1. Import the repository into Vercel and set the project root to `frontend`.
+2. Configure `VITE_API_BASE_URL` to the deployed API URL ending in `/api`.
+3. Build using `npm run build`; Vite outputs the static site to `dist`.
+4. Deploy and verify the login page and API connectivity.
 
-### Users
-- GET /api/users
-- POST /api/users/create
+### Backend
 
-### Products
-- GET /api/products
-- POST /api/products/add
-- PUT /api/products/:id
-- DELETE /api/products/:id
+1. Create a Node.js service on Render with the repository's `server` directory as its root, or deploy the provided Dockerfile from the repository root.
+2. Set `MONGO_URI`, `JWT_SECRET`, and `PORT` in the service environment.
+3. Ensure the MongoDB network rules permit the backend to connect.
+4. Verify the service health endpoint at `/api/health` and the Swagger UI at `/api-docs`.
 
-### Categories
-- GET /api/categories
-- POST /api/categories/add
-- DELETE /api/categories/:id
+Keep frontend and backend URLs aligned, configure allowed CORS origins for your actual deployment, and use separate credentials for development and production. See [Deployment Guide](docs/deployment.md).
 
-### Suppliers
-- GET /api/suppliers
-- POST /api/suppliers/add
-- PUT /api/suppliers/:id
-- DELETE /api/suppliers/:id
+## Security Features
 
-### Orders
-- GET /api/orders
-- POST /api/orders
-- DELETE /api/orders/:id
+- Password hashing with bcrypt
+- JWT authentication for protected API routes
+- Role-based authorization middleware for restricted user operations
+- Business-aware access and tenant-scoped data patterns
+- Required server secrets supplied through environment variables
 
-## Security notes
+These are baseline protections, not a claim of a completed security audit. The current server enables permissive CORS, and the repository's Compose file contains a development-only JWT secret. Before handling real user or business data, restrict CORS, rotate and protect secrets, remove or disable demo-account initialization, add request validation and login rate limiting, and review tenant filtering across every controller. See [Security Review](docs/security-review.md).
 
-- JWT-based authentication is used for protected routes
-- Passwords are hashed securely using bcrypt
-- Business data is restricted by businessId scope
-- Only allowed roles can create specific user types
+## Future Roadmap
 
-## Portfolio positioning
+- [ ] Add automated API tests for authentication, authorization, and tenant isolation
+- [ ] Expand and validate the OpenAPI specification against all implemented endpoints
+- [ ] Add shared request validation and centralized error handling
+- [ ] Add login rate limiting and configurable CORS allowlists
+- [ ] Add pagination, filtering, and sorting for growing datasets
+- [ ] Add audit history for privileged and inventory-changing operations
+- [ ] Add CI checks for linting, tests, and production builds
+- [ ] Add current product screenshots and a short walkthrough
 
-This project is ideal for a portfolio because it demonstrates real-world product thinking instead of just a tutorial app.
+## Contributing
 
-It shows:
-- SaaS-style architecture
-- multi-tenant access control
-- operational business workflows
-- practical backend logic
-- full-stack delivery from planning to deployment
-
-### Best way to present it in your portfolio
-
-Use this pitch:
-
-> StorMate is a full-stack multi-tenant inventory and business management platform built with React, Node.js, and MongoDB. It models a real-world SaaS workflow where a superadmin creates business admins, admins manage staff and customers, and staff handle inventory, suppliers, and transactions within their business scope.
+Issues and pull requests are welcome. For substantial changes, open an issue first to discuss the expected behavior. Please avoid including real customer information, credentials, or production database data in issues and test fixtures.
 
 ## License
 
-This project is licensed under the MIT License.
-
-## Acknowledgements
-
-Built for practical business workflow simulation and full-stack portfolio development.
+StorMate is distributed under the [MIT License](LICENSE).
