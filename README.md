@@ -1,200 +1,211 @@
 # StorMate
 
-StorMate is a full-stack inventory and order management platform for businesses that need to manage stock, suppliers, categories, and transactions in a structured, role-based system. It is designed for multi-tenant operations, where each business has isolated data and controlled access for admins, staff, and superadmins.
+A full-stack multi-tenant inventory and business management system designed for modern retail and operational teams.
 
-## Overview
+StorMate helps businesses manage products, suppliers, stock movement, orders, and users across multiple business accounts while keeping each tenant's data isolated and securely scoped.
 
-This project combines a React frontend with an Express + MongoDB backend to deliver a modern inventory dashboard for operational teams. It supports product tracking, stock updates, supplier management, order handling, and access control across multiple business tenants.
+## Why this project matters
 
-## Key Features
+This project was built to solve a real business problem:
+- businesses need a clean way to manage inventory and stock
+- teams need role-based access control
+- owners want multi-business visibility without data leakage
+- operations need a simple dashboard for products, suppliers, and transactions
 
-- Multi-tenant architecture with business-scoped data isolation
-- Product, category, and supplier management
-- Order tracking and transaction history
-- Real-time stock movement logging
-- Role-based access control for admin, staff, and superadmin users
-- JWT-based authentication and protected API routes
-- Swagger API documentation
-- Dockerized local development setup
+It is a strong portfolio project because it combines:
+- full-stack JavaScript development
+- authentication and authorization
+- multi-tenant architecture
+- database design and data modeling
+- business workflow logic
+- API-driven backend systems
 
-## Tech Stack
+## Live demo
 
-- Frontend: React, Vite
-- Backend: Node.js, Express
-- Database: MongoDB, Mongoose
-- Authentication: JWT, bcrypt
-- API Docs: Swagger UI
-- Deployment / Local Setup: Docker Compose
+Frontend: https://stor-mate.vercel.app
+Backend: https://stormate-8p52.onrender.com/api
 
-## Project Structure
+## Tech stack
 
-```text
-StorMate-main/
-├── frontend/
+- Frontend: React + Vite
+- Styling: Tailwind CSS
+- Backend: Node.js + Express
+- Database: MongoDB + Mongoose
+- Authentication: JWT + bcrypt
+- Deployment: Vercel + Render
+
+## Core features
+
+- Multi-tenant business architecture with business-scoped data access
+- Role-based access for superadmin, admin, staff, and customer
+- Product inventory and stock tracking
+- Supplier management
+- Order and transaction tracking
+- User creation with business-aware permissions
+- Protected routes and secure token-based auth
+- Dashboard-driven admin workflows
+- Responsive UI for operational use
+
+## Business role flow
+
+This project follows a practical SaaS-style access model:
+
+- Superadmin creates business admins
+- Business admin creates staff and customers for their business
+- Staff manages inventory and transactions within their assigned business
+- Customers can be tracked as business users as needed
+
+## Project structure
+
+```bash
+StorMate/
+├── frontend/                # React + Vite frontend
 │   ├── src/
 │   ├── public/
-│   ├── package.json
-│   ├── vite.config.js
-│   └── index.html
-├── server/
+│   └── package.json
+├── server/                  # Express + MongoDB backend
 │   ├── controllers/
-│   ├── db/
-│   ├── middleware/
 │   ├── models/
 │   ├── routes/
-│   ├── index.js
+│   ├── middleware/
+│   ├── db/
 │   ├── seed.js
-│   ├── swagger.js
+│   ├── index.js
 │   └── package.json
+├── README.md
+├── package.json
 ├── Dockerfile
 ├── docker-compose.yml
 ├── LICENSE
-├── package.json
-└── README.md
+└── .gitignore
 ```
 
-## Getting Started
+## Demo accounts
+
+The app includes seeded demo accounts for local setup:
+
+- Superadmin: owner@storemate.com / ownersuperadmin
+- Tech Corp Admin: admin@techcorp.com / admintech
+- Tech Corp Staff: staff@techcorp.com / stafftech
+
+## Local setup
 
 ### Prerequisites
 
 - Node.js 18+
-- MongoDB running locally or a remote MongoDB URI
-- npm
-- Docker + Docker Compose (optional)
+- MongoDB running locally or a MongoDB Atlas connection
 
-### Backend Configuration
+### 1. Clone the repository
 
-Create a `.env` file inside the `server` directory:
+```bash
+git clone https://github.com/ZilkarNayeen/StorMate.git
+cd StorMate
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+cd frontend && npm install && cd ..
+cd server && npm install && cd ..
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file inside the `server` folder:
 
 ```env
 PORT=5713
 MONGO_URI=mongodb://127.0.0.1:27017/storemate
-JWT_SECRET=your_super_secret_key
+JWT_SECRET=your_secure_jwt_secret
 ```
 
-### Frontend Configuration
-
-If needed, create a `.env` file in `frontend`:
-
-```env
-VITE_API_BASE_URL=http://localhost:5713/api
-```
-
-### Install Dependencies
+### 4. Seed the database
 
 ```bash
 cd server
-npm install
-
-cd ../frontend
-npm install
-```
-
-### Seed Demo Data
-
-```bash
-cd ../server
 node seed.js
 ```
 
-This creates sample businesses, users, products, suppliers, and categories.
-
-### Run the Application
-
-Start the backend:
+### 5. Start the backend
 
 ```bash
 cd server
 npm start
 ```
 
-Start the frontend in a second terminal:
+### 6. Start the frontend
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-The app should be available at:
+Then open:
 
 - Frontend: http://localhost:5173
-- Backend: http://localhost:5713
-- Swagger Docs: http://localhost:5713/api-docs
+- Backend: http://localhost:5713/api
 
-## Demo Accounts
+## API overview
 
-The seed script creates sample users for testing:
+### Authentication
+- POST /api/auth/login
+- POST /api/auth/register
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Superadmin | owner@storemate.com | ownersuperadmin |
-| Admin | admin@techcorp.com | admintech |
-| Staff | staff@techcorp.com | stafftech |
-| Admin | admin@fashionhub.com | adminfashion |
-| Staff | staff@fashionhub.com | stafffashion |
+### Users
+- GET /api/users
+- POST /api/users/create
 
-## API Overview
+### Products
+- GET /api/products
+- POST /api/products/add
+- PUT /api/products/:id
+- DELETE /api/products/:id
 
-Main backend routes include:
+### Categories
+- GET /api/categories
+- POST /api/categories/add
+- DELETE /api/categories/:id
 
-- `/api/auth` for login and authentication
-- `/api/products` for product management
-- `/api/categories` for category management
-- `/api/suppliers` for suppliers
-- `/api/orders` for orders
-- `/api/itemTransaction` for stock history
-- `/api/users` for user management
+### Suppliers
+- GET /api/suppliers
+- POST /api/suppliers/add
+- PUT /api/suppliers/:id
+- DELETE /api/suppliers/:id
 
-## Docker Setup
+### Orders
+- GET /api/orders
+- POST /api/orders
+- DELETE /api/orders/:id
 
-To run the project with Docker Compose:
+## Security notes
 
-```bash
-docker compose up --build
-```
+- JWT-based authentication is used for protected routes
+- Passwords are hashed securely using bcrypt
+- Business data is restricted by businessId scope
+- Only allowed roles can create specific user types
 
-This starts the backend and MongoDB container with the default project configuration.
+## Portfolio positioning
 
-## Deployment Notes
+This project is ideal for a portfolio because it demonstrates real-world product thinking instead of just a tutorial app.
 
-For deployment, configure environment variables in your hosting platform or container environment:
+It shows:
+- SaaS-style architecture
+- multi-tenant access control
+- operational business workflows
+- practical backend logic
+- full-stack delivery from planning to deployment
 
-- set `PORT`
-- set `MONGO_URI`
-- set `JWT_SECRET`
-- ensure the frontend `VITE_API_BASE_URL` points to the deployed backend
+### Best way to present it in your portfolio
 
-A typical production deployment flow is:
+Use this pitch:
 
-1. deploy the backend to a Node.js host or container
-2. deploy the frontend to Vercel, Netlify, or similar static host
-3. connect both to the same MongoDB instance
-4. run the seed script once if demo data is required
-
-## Screenshots
-
-Add screenshots in the repository to showcase the dashboard, product management, orders, and inventory views.
-
-Example structure:
-
-```text
-/screenshots/
-├── dashboard.png
-├── products.png
-├── orders.png
-└── login.png
-```
-
-Then reference them in the README:
-
-```md
-![Dashboard](./screenshots/dashboard.png)
-```
+> StorMate is a full-stack multi-tenant inventory and business management platform built with React, Node.js, and MongoDB. It models a real-world SaaS workflow where a superadmin creates business admins, admins manage staff and customers, and staff handle inventory, suppliers, and transactions within their business scope.
 
 ## License
 
 This project is licensed under the MIT License.
 
-## Contributing
+## Acknowledgements
 
-Contributions are welcome. If you would like to improve the project, open an issue or submit a pull request with a clear description of the change.
+Built for practical business workflow simulation and full-stack portfolio development.
